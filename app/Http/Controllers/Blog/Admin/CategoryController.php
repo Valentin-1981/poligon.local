@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Blog\Admin;
 use App\Models\BlogCategory;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
+use App\Repositories\BlogCategoryRepository;
 
 
 class CategoryController extends BaseController
@@ -78,16 +79,20 @@ class CategoryController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param BlogCategoryRepository $categoryRepository
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit(BlogCategoryRepository $categoryRepository, $id)
     {
 //        dd(__METHOD__);
-        $item = BlogCategory::findOrFail($id);
-        $categoryList = BlogCategory::all();
-//        $item = $categoryRepositoy->getEdit($id);
-//        $categoryList = $categoryRepository->getFromComboBox();
+//        $item = BlogCategory::findOrFail($id);
+//        $categoryList = BlogCategory::all();
+        $item = $categoryRepository->getEdit($id);
+        if(empty($item)){
+            abort(404);
+        }
+        $categoryList = $categoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -95,8 +100,8 @@ class CategoryController extends BaseController
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param BlogCategoryUpdateRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(BlogCategoryUpdateRequest $request, $id)

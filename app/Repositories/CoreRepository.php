@@ -13,7 +13,7 @@ abstract class CoreRepository{
     abstract protected function getModelClass();
 
     protected  function startConditions(){
-        return $this->model;
+        return clone $this->model;
     }
 }
 

@@ -7,32 +7,45 @@ use App\Models\BlogCategory;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
 use App\Repositories\BlogCategoryRepository;
+use Illuminate\Http\Response;
 
 
 class CategoryController extends BaseController
 {
     /**
+     * @var BlogCategoryRepository|\Illuminate\Foundation\Application|mixed
+     */
+    private $categoryRepository;
+
+    public function  __construct()
+    {
+        parent::__construct();
+        $this->categoryRepository = app(BlogCategoryRepository::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
 //        dd(__METHOD__);
-        $paginator = BlogCategory::paginate(5);
+//        $paginator = BlogCategory::paginate(5);
+        $paginator = $this->categoryRepository->getAllWithPaginate(5);
         return view('blog.admin.categories.index', compact('paginator'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
 //        dd(__METHOD__);
         $item = new BlogCategory();
-        $categoryList = BlogCategory::all();
+        $categoryList = $this->categoryRepository->getForComboBox();
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
 
@@ -40,7 +53,7 @@ class CategoryController extends BaseController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(BlogCategoryCreateRequest $request)
     {
@@ -69,7 +82,7 @@ class CategoryController extends BaseController
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -79,20 +92,20 @@ class CategoryController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param BlogCategoryRepository $categoryRepository
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param BlogCategoryRepository $categoryRepository
+     * @return Response
      */
-    public function edit(BlogCategoryRepository $categoryRepository, $id)
+    public function edit($id)
     {
 //        dd(__METHOD__);
 //        $item = BlogCategory::findOrFail($id);
 //        $categoryList = BlogCategory::all();
-        $item = $categoryRepository->getEdit($id);
+        $item = $this->categoryRepository->getEdit($id);
         if(empty($item)){
             abort(404);
         }
-        $categoryList = $categoryRepository->getForComboBox();
+        $categoryList = $this->categoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -102,7 +115,7 @@ class CategoryController extends BaseController
      *
      * @param BlogCategoryUpdateRequest $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(BlogCategoryUpdateRequest $request, $id)
     {
@@ -124,7 +137,7 @@ class CategoryController extends BaseController
         $validatedData[] = $validator->fails();*/
 //        dd($validatedData);
 //        dd(__METHOD__);
-        $item = BlogCategory::find($id);
+        $item = $this->categoryRepository->getEdit($id);
 //        dd($item);
         if(empty($item)){
             return back()->withErrors(['msg' => "Запись id=[{$id}] не найдена"])->withInput();
@@ -150,7 +163,7 @@ class CategoryController extends BaseController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {

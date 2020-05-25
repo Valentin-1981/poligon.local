@@ -1,6 +1,7 @@
 @php
     /** @var \App\Models\BlogCategory $item */
-    /** @var \Illuminate\Support\Collection $categoryList */
+{{-- @var \Illuminate\Support\Collection $categoryList --}}
+/** @var App\Http\Controllers\Blog\Admin\CategoryController $categoryList */
 @endphp
 <div class="row justify-content-center">
     <div class="col-md-12">

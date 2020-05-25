@@ -6,21 +6,22 @@ namespace App\Http\Controllers\Blog\Admin;
 use App\Models\BlogCategory;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Http\Requests\BlogCategoryCreateRequest;
-use App\Repositories\BlogCategoryRepository;
+use App\Repositories\BlogCategoryRepository as BlogCategoryRepositoryAlias;
 use Illuminate\Http\Response;
 
 
 class CategoryController extends BaseController
 {
+
     /**
-     * @var BlogCategoryRepository|\Illuminate\Foundation\Application|mixed
+     * @var BlogCategoryRepositoryAlias|\Illuminate\Foundation\Application|mixed
      */
-    private $categoryRepository;
+    private $blogCategoryRepository;
 
     public function  __construct()
     {
         parent::__construct();
-        $this->categoryRepository = app(BlogCategoryRepository::class);
+        $this->blogCategoryRepository = app(BlogCategoryRepositoryAlias::class);
     }
 
     /**
@@ -32,7 +33,7 @@ class CategoryController extends BaseController
     {
 //        dd(__METHOD__);
 //        $paginator = BlogCategory::paginate(5);
-        $paginator = $this->categoryRepository->getAllWithPaginate(5);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
         return view('blog.admin.categories.index', compact('paginator'));
     }
 
@@ -45,7 +46,7 @@ class CategoryController extends BaseController
     {
 //        dd(__METHOD__);
         $item = new BlogCategory();
-        $categoryList = $this->categoryRepository->getForComboBox();
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
 
@@ -93,7 +94,7 @@ class CategoryController extends BaseController
      * Show the form for editing the specified resource.
      *
      * @param int $id
-     * @param BlogCategoryRepository $categoryRepository
+     * @param BlogCategoryRepositoryAlias $categoryRepository
      * @return Response
      */
     public function edit($id)
@@ -101,11 +102,13 @@ class CategoryController extends BaseController
 //        dd(__METHOD__);
 //        $item = BlogCategory::findOrFail($id);
 //        $categoryList = BlogCategory::all();
-        $item = $this->categoryRepository->getEdit($id);
+        $item = $this->blogCategoryRepository->getEdit($id);
         if(empty($item)){
             abort(404);
         }
-        $categoryList = $this->categoryRepository->getForComboBox();
+        dd($item);
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
+//        dd($categoryList);
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -137,7 +140,7 @@ class CategoryController extends BaseController
         $validatedData[] = $validator->fails();*/
 //        dd($validatedData);
 //        dd(__METHOD__);
-        $item = $this->categoryRepository->getEdit($id);
+        $item = $this->blogCategoryRepository->getEdit($id);
 //        dd($item);
         if(empty($item)){
             return back()->withErrors(['msg' => "Запись id=[{$id}] не найдена"])->withInput();
